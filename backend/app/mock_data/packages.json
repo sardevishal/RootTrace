@@ -1,0 +1,27 @@
+[
+    {
+        "package_name": "lodash",
+        "version": "4.17.15",
+        "ecosystem": "npm"
+    },
+    {
+        "package_name": "requests",
+        "version": "2.25.0",
+        "ecosystem": "PyPI"
+    },
+    {
+        "package_name": "express",
+        "version": "4.17.1",
+        "ecosystem": "npm"
+    },
+    {
+        "package_name": "django",
+        "version": "3.2.0",
+        "ecosystem": "PyPI"
+    },
+    {
+        "package_name": "log4j-core",
+        "version": "2.14.1",
+        "ecosystem": "Maven"
+    }
+]
