@@ -11,17 +11,19 @@ Run with:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.vulnerability import router as vulnerability_router
+from app.api.dependency import router as dependency_router
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 app = FastAPI(
-    title="RootTrace — Vulnerability Intelligence Engine",
+    title="RootTrace — Supply Chain Security Platform",
     description=(
-        "Phase 1: Mock package loading → OSV vulnerability scanning → "
-        "Risk scoring → Structured JSON response."
+        "RootTrace Backend Services:\n"
+        "- Dependency Analysis Engine: Manifest Parsing, Graph Construction & Metadata\n"
+        "- Vulnerability Intelligence Engine: OSV Scanning & Risk Scoring"
     ),
-    version="0.1.0",
+    version="0.2.0",
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -37,6 +39,7 @@ app.add_middleware(
 
 # ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(vulnerability_router)
+app.include_router(dependency_router)
 
 
 @app.get("/", tags=["Root"])
@@ -44,8 +47,10 @@ def root() -> dict:
     """Root health check — confirms the API is running."""
     return {
         "project": "RootTrace",
-        "module": "Vulnerability Intelligence Engine",
-        "phase": 1,
+        "modules": [
+            "Dependency Analysis Engine",
+            "Vulnerability Intelligence Engine",
+        ],
         "status": "running",
         "docs": "/docs",
     }

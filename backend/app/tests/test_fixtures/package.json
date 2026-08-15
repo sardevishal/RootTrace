@@ -1,0 +1,19 @@
+{
+  "name": "roottrace-sample-backend",
+  "version": "1.0.0",
+  "description": "Sample backend for dependency scanner tests",
+  "dependencies": {
+    "express": "^4.18.2",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "eslint": "^8.40.0"
+  },
+  "optionalDependencies": {
+    "fsevents": "^2.3.2"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  }
+}

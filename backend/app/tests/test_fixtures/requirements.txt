@@ -1,0 +1,8 @@
+# RootTrace Test requirements.txt
+requests==2.31.0
+flask>=2.0.0
+django~=4.2.0
+numpy<2.0.0
+urllib3!=1.26.0
+celery[redis]==5.3.1
+pytest  # testing framework without fixed version
