@@ -69,3 +69,43 @@ def test_malformed_package_json(tmp_path):
     parser = PackageJsonParser()
     with pytest.raises(ValueError, match="Invalid JSON"):
         parser.parse(manifest)
+
+def test_parse_package_json_no_lockfile(tmp_path):
+    pkg_file = tmp_path / "package.json"
+    pkg_file.write_text('{"dependencies": {"lodash": "^4.17.0"}}', encoding="utf-8")
+
+    manifest = ManifestInfo(
+        path="package.json",
+        absolute_path=str(pkg_file),
+        manifest_type="package.json",
+        ecosystem="npm",
+        has_lockfile=False,
+    )
+
+    parser = PackageJsonParser()
+    deps = parser.parse(manifest)
+    
+    assert len(deps) == 1
+    assert deps[0].name == "lodash"
+    assert deps[0].version_spec == "^4.17.0"
+    assert deps[0].version is None
+
+def test_parse_package_json_exact_version(tmp_path):
+    pkg_file = tmp_path / "package.json"
+    pkg_file.write_text('{"dependencies": {"lodash": "4.17.15"}}', encoding="utf-8")
+
+    manifest = ManifestInfo(
+        path="package.json",
+        absolute_path=str(pkg_file),
+        manifest_type="package.json",
+        ecosystem="npm",
+        has_lockfile=False,
+    )
+
+    parser = PackageJsonParser()
+    deps = parser.parse(manifest)
+    
+    assert len(deps) == 1
+    assert deps[0].name == "lodash"
+    assert deps[0].version_spec == "4.17.15"
+    assert deps[0].version == "4.17.15"

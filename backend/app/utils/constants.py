@@ -15,6 +15,10 @@ SUPPORTED_ECOSYSTEMS = [
     "NuGet",
     "crates.io",
     "Packagist",
+    "apt",
+    "apk",
+    "yum",
+    "mixed",
 ]
 
 # ─── OSV API ─────────────────────────────────────────────────────────────────

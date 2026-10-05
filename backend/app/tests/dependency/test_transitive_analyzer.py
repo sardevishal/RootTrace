@@ -18,8 +18,9 @@ def test_transitive_analyzer():
             ecosystem="Go",
             source_manifest="go.mod",
             source_path="go.mod",
-            go_indirect=False,
             dependency_type="runtime",
+            direct=True,
+            parent_ids=[],
         ),
         Dependency(
             id="Go:github.com/stretchr/testify@v1.8.4",
@@ -27,8 +28,9 @@ def test_transitive_analyzer():
             ecosystem="Go",
             source_manifest="go.mod",
             source_path="go.mod",
-            go_indirect=True,
             dependency_type="indirect",
+            direct=False,
+            parent_ids=["Go:github.com/gin-gonic/gin@v1.9.1"],
         ),
     ]
 

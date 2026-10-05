@@ -108,10 +108,10 @@ class TestValidator:
         with pytest.raises(Exception):
             Package(package_name="bad", version="1.0.0", ecosystem="FakeEco")
 
-    def test_rejects_blank_version(self):
-        """Packages with blank versions should fail at model level."""
-        with pytest.raises(Exception):
-            Package(package_name="lodash", version="   ", ecosystem="npm")
+    def test_accepts_blank_version_as_empty(self):
+        """Packages with blank versions are stripped to empty string, which is allowed as unresolved."""
+        pkg = Package(package_name="lodash", version="   ", ecosystem="npm")
+        assert pkg.version == ""
 
     def test_empty_list(self):
         """Empty input should return empty valid list and no errors."""
@@ -209,7 +209,10 @@ class TestEngine:
     def test_run_scan_returns_response(self, valid_packages):
         """Engine should return a VulnerabilityResponse with correct package count."""
         engine = VulnerabilityEngine()
-        result = engine.run_scan(packages=valid_packages)
+        from app.services.vulnerability.package_provider import PackageProvider
+        class StaticProv(PackageProvider):
+            def get_packages(self, scan_id=None): return valid_packages
+        result = engine.run_scan(package_provider=StaticProv())
         assert result.total_packages_scanned == 2
         assert isinstance(result.packages, list)
         assert len(result.packages) == 2
@@ -217,6 +220,9 @@ class TestEngine:
     def test_run_scan_no_crash_on_empty(self):
         """Engine should handle zero valid packages gracefully."""
         engine = VulnerabilityEngine()
-        result = engine.run_scan(packages=[])
+        from app.services.vulnerability.package_provider import PackageProvider
+        class StaticProv(PackageProvider):
+            def get_packages(self, scan_id=None): return []
+        result = engine.run_scan(package_provider=StaticProv())
         assert result.total_packages_scanned == 0
         assert result.total_vulnerabilities_found == 0

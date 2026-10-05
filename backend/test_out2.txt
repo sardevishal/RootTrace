@@ -1,0 +1,226 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.4, pytest-9.1.1, pluggy-1.6.0 -- C:\Python314\python.exe
+cachedir: .pytest_cache
+rootdir: D:\BE\Final Year Project\RootTrace\backend
+plugins: anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 3 items
+
+app/tests/integration/test_pipeline_orchestrator.py::test_pipeline_scan_id_propagation FAILED [ 33%]
+app/tests/integration/test_pipeline_orchestrator.py::test_pipeline_cycle_protection FAILED [ 66%]
+app/tests/integration/test_pipeline_orchestrator.py::test_pipeline_partial_failure FAILED [100%]
+
+================================== FAILURES ===================================
+______________________ test_pipeline_scan_id_propagation ______________________
+app\tests\integration\test_pipeline_orchestrator.py:33: in test_pipeline_scan_id_propagation
+    result = orchestrator.run_pipeline(fixtures_path, scan_id=scan_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\services\pipeline.py:57: in run_pipeline
+    packages.append(Package(
+E   pydantic_core._pydantic_core.ValidationError: 1 validation error for Package
+E   ecosystem
+E     Value error, Unsupported ecosystem 'apt'. Supported: ['npm', 'PyPI', 'Maven', 'Go', 'RubyGems', 'NuGet', 'crates.io', 'Packagist'] [type=value_error, input_value='apt', input_type=str]
+E       For further information visit https://errors.pydantic.dev/2.13/v/value_error
+---------------------------- Captured stdout call -----------------------------
+2026-10-06 00:59:21 | INFO     | app.services.pipeline | Pipeline | Starting scan_id=test-scan-001 for D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | ════════════════════════════════════════════════════════════
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | Starting scan (id=test-scan-001)
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | Repository: D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+2026-10-06 00:59:21 | INFO     | app.services.dependency.repository_scanner | RepositoryScanner | Scanning: D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+2026-10-06 00:59:21 | INFO     | app.services.dependency.repository_scanner | RepositoryScanner | Found 7 files in D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | Found 7 files in repository
+2026-10-06 00:59:21 | INFO     | app.services.dependency.manifest_detector | ManifestDetector | Scanning 7 files for manifests
+2026-10-06 00:59:21 | INFO     | app.services.dependency.manifest_detector | ManifestDetector | Detected 6 manifest(s) from 7 files
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | Detected 6 manifest(s)
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | Parsing [Dockerfile] Dockerfile
+2026-10-06 00:59:21 | INFO     | app.parsers.dockerfile_parser | DockerfileParser | Parsing: Dockerfile
+2026-10-06 00:59:21 | INFO     | app.parsers.dockerfile_parser | DockerfileParser | Found 5 package references in Dockerfile
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | → 5 dependencies from Dockerfile
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | Parsing [package.json] frontend/package.json
+2026-10-06 00:59:21 | INFO     | app.parsers.package_json_parser | PackageJsonParser | Parsing: frontend/package.json
+2026-10-06 00:59:21 | INFO     | app.parsers.package_json_parser | PackageJsonParser | Found 2 dependencies in frontend/package.json
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | → 2 dependencies from frontend/package.json
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | Parsing [go.mod] go.mod
+2026-10-06 00:59:21 | INFO     | app.parsers.go_mod_parser | GoModParser | Parsing: go.mod
+2026-10-06 00:59:21 | INFO     | app.parsers.go_mod_parser | GoModParser | Found 4 dependencies in go.mod
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | → 4 dependencies from go.mod
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | Parsing [package.json] package.json
+2026-10-06 00:59:21 | INFO     | app.parsers.package_json_parser | PackageJsonParser | Parsing: package.json
+2026-10-06 00:59:21 | INFO     | app.parsers.package_json_parser | PackageJsonParser | Found 6 dependencies in package.json
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | → 6 dependencies from package.json
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | Parsing [pom.xml] pom.xml
+2026-10-06 00:59:21 | INFO     | app.parsers.pom_parser | PomParser | Parsing: pom.xml
+2026-10-06 00:59:21 | INFO     | app.parsers.pom_parser | PomParser | Found 4 dependencies in pom.xml
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | → 4 dependencies from pom.xml
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | Parsing [requirements.txt] requirements.txt
+2026-10-06 00:59:21 | INFO     | app.parsers.requirements_parser | RequirementsParser | Parsing: requirements.txt
+2026-10-06 00:59:21 | INFO     | app.parsers.requirements_parser | RequirementsParser | Found 7 dependencies in requirements.txt
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | → 7 dependencies from requirements.txt
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | Total raw parsed: 28 from 6 manifests
+2026-10-06 00:59:21 | INFO     | app.services.dependency.dependency_normalizer | DependencyNormalizer | Normalized 28 dependencies (26 unique, 0 warnings)
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | Normalized: 26 unique dependencies
+2026-10-06 00:59:21 | INFO     | app.services.dependency.dependency_resolver | DependencyResolver | Resolved: 14 / 26 dependencies. Unresolved: 12
+2026-10-06 00:59:21 | INFO     | app.services.dependency.transitive_analyzer | TransitiveAnalyzer | Phase 1 classification complete: 26 direct, 0 transitive
+2026-10-06 00:59:21 | INFO     | app.services.dependency.graph_builder | GraphBuilder | Building graph from 26 dependencies
+2026-10-06 00:59:21 | INFO     | app.services.dependency.graph_builder | GraphBuilder | Graph built: 27 nodes, 26 edges
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | DependencyEngine | Scan complete — status=completed_with_warnings | deps=26 (direct=26, transitive=0) | manifests=6/6 | errors=0 | warnings=1
+2026-10-06 00:59:21 | INFO     | app.services.dependency.engine | ════════════════════════════════════════════════════════════
+------------------------------ Captured log call ------------------------------
+INFO     app.services.pipeline:pipeline.py:39 Pipeline | Starting scan_id=test-scan-001 for D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+INFO     app.services.dependency.engine:engine.py:126 ════════════════════════════════════════════════════════════
+INFO     app.services.dependency.engine:engine.py:127 DependencyEngine | Starting scan (id=test-scan-001)
+INFO     app.services.dependency.engine:engine.py:128 DependencyEngine | Repository: D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+INFO     app.services.dependency.repository_scanner:repository_scanner.py:81 RepositoryScanner | Scanning: D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+INFO     app.services.dependency.repository_scanner:repository_scanner.py:86 RepositoryScanner | Found 7 files in D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+INFO     app.services.dependency.engine:engine.py:146 DependencyEngine | Found 7 files in repository
+INFO     app.services.dependency.manifest_detector:manifest_detector.py:57 ManifestDetector | Scanning 7 files for manifests
+INFO     app.services.dependency.manifest_detector:manifest_detector.py:129 ManifestDetector | Detected 6 manifest(s) from 7 files
+INFO     app.services.dependency.engine:engine.py:168 DependencyEngine | Detected 6 manifest(s)
+INFO     app.services.dependency.engine:engine.py:184 DependencyEngine | Parsing [Dockerfile] Dockerfile
+INFO     app.parsers.dockerfile_parser:dockerfile_parser.py:137 DockerfileParser | Parsing: Dockerfile
+INFO     app.parsers.dockerfile_parser:dockerfile_parser.py:187 DockerfileParser | Found 5 package references in Dockerfile
+INFO     app.services.dependency.engine:engine.py:194 DependencyEngine | → 5 dependencies from Dockerfile
+INFO     app.services.dependency.engine:engine.py:184 DependencyEngine | Parsing [package.json] frontend/package.json
+INFO     app.parsers.package_json_parser:package_json_parser.py:60 PackageJsonParser | Parsing: frontend/package.json
+INFO     app.parsers.package_json_parser:package_json_parser.py:118 PackageJsonParser | Found 2 dependencies in frontend/package.json
+INFO     app.services.dependency.engine:engine.py:194 DependencyEngine | → 2 dependencies from frontend/package.json
+INFO     app.services.dependency.engine:engine.py:184 DependencyEngine | Parsing [go.mod] go.mod
+INFO     app.parsers.go_mod_parser:go_mod_parser.py:78 GoModParser | Parsing: go.mod
+INFO     app.parsers.go_mod_parser:go_mod_parser.py:136 GoModParser | Found 4 dependencies in go.mod
+INFO     app.services.dependency.engine:engine.py:194 DependencyEngine | → 4 dependencies from go.mod
+INFO     app.services.dependency.engine:engine.py:184 DependencyEngine | Parsing [package.json] package.json
+INFO     app.parsers.package_json_parser:package_json_parser.py:60 PackageJsonParser | Parsing: package.json
+INFO     app.parsers.package_json_parser:package_json_parser.py:118 PackageJsonParser | Found 6 dependencies in package.json
+INFO     app.services.dependency.engine:engine.py:194 DependencyEngine | → 6 dependencies from package.json
+INFO     app.services.dependency.engine:engine.py:184 DependencyEngine | Parsing [pom.xml] pom.xml
+INFO     app.parsers.pom_parser:pom_parser.py:97 PomParser | Parsing: pom.xml
+INFO     app.parsers.pom_parser:pom_parser.py:137 PomParser | Found 4 dependencies in pom.xml
+INFO     app.services.dependency.engine:engine.py:194 DependencyEngine | → 4 dependencies from pom.xml
+INFO     app.services.dependency.engine:engine.py:184 DependencyEngine | Parsing [requirements.txt] requirements.txt
+INFO     app.parsers.requirements_parser:requirements_parser.py:71 RequirementsParser | Parsing: requirements.txt
+INFO     app.parsers.requirements_parser:requirements_parser.py:82 RequirementsParser | Found 7 dependencies in requirements.txt
+INFO     app.services.dependency.engine:engine.py:194 DependencyEngine | → 7 dependencies from requirements.txt
+INFO     app.services.dependency.engine:engine.py:230 DependencyEngine | Total raw parsed: 28 from 6 manifests
+INFO     app.services.dependency.dependency_normalizer:dependency_normalizer.py:189 DependencyNormalizer | Normalized 28 dependencies (26 unique, 0 warnings)
+INFO     app.services.dependency.engine:engine.py:241 DependencyEngine | Normalized: 26 unique dependencies
+INFO     app.services.dependency.dependency_resolver:dependency_resolver.py:79 DependencyResolver | Resolved: 14 / 26 dependencies. Unresolved: 12
+INFO     app.services.dependency.transitive_analyzer:transitive_analyzer.py:95 TransitiveAnalyzer | Phase 1 classification complete: 26 direct, 0 transitive
+INFO     app.services.dependency.graph_builder:graph_builder.py:72 GraphBuilder | Building graph from 26 dependencies
+INFO     app.services.dependency.graph_builder:graph_builder.py:152 GraphBuilder | Graph built: 27 nodes, 26 edges
+INFO     app.services.dependency.engine:engine.py:295 DependencyEngine | Scan complete — status=completed_with_warnings | deps=26 (direct=26, transitive=0) | manifests=6/6 | errors=0 | warnings=1
+INFO     app.services.dependency.engine:engine.py:307 ════════════════════════════════════════════════════════════
+_______________________ test_pipeline_cycle_protection ________________________
+app\tests\integration\test_pipeline_orchestrator.py:65: in test_pipeline_cycle_protection
+    paths = orchestrator._compute_paths(scan_result)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\services\pipeline.py:117: in _compute_paths
+    dfs("root:application@0.0.0", [])
+app\services\pipeline.py:114: in dfs
+    for child_id in graph.adjacency.get(node_id, []):
+                    ^^^^^^^^^^^^^^^
+C:\Python314\Lib\site-packages\pydantic\main.py:1042: in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E   AttributeError: 'DependencyScanResult' object has no attribute 'adjacency'
+________________________ test_pipeline_partial_failure ________________________
+app\tests\integration\test_pipeline_orchestrator.py:91: in test_pipeline_partial_failure
+    result = orchestrator.run_pipeline(fixtures_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\services\pipeline.py:57: in run_pipeline
+    packages.append(Package(
+E   pydantic_core._pydantic_core.ValidationError: 1 validation error for Package
+E   ecosystem
+E     Value error, Unsupported ecosystem 'apt'. Supported: ['npm', 'PyPI', 'Maven', 'Go', 'RubyGems', 'NuGet', 'crates.io', 'Packagist'] [type=value_error, input_value='apt', input_type=str]
+E       For further information visit https://errors.pydantic.dev/2.13/v/value_error
+---------------------------- Captured stdout call -----------------------------
+2026-10-06 00:59:22 | INFO     | app.services.pipeline | Pipeline | Starting scan_id=scan-9ab5e902-0487-4bf9-9e8c-4de84bfe594d for D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | ════════════════════════════════════════════════════════════
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | Starting scan (id=scan-9ab5e902-0487-4bf9-9e8c-4de84bfe594d)
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | Repository: D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+2026-10-06 00:59:22 | INFO     | app.services.dependency.repository_scanner | RepositoryScanner | Scanning: D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+2026-10-06 00:59:22 | INFO     | app.services.dependency.repository_scanner | RepositoryScanner | Found 7 files in D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | Found 7 files in repository
+2026-10-06 00:59:22 | INFO     | app.services.dependency.manifest_detector | ManifestDetector | Scanning 7 files for manifests
+2026-10-06 00:59:22 | INFO     | app.services.dependency.manifest_detector | ManifestDetector | Detected 6 manifest(s) from 7 files
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | Detected 6 manifest(s)
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | Parsing [Dockerfile] Dockerfile
+2026-10-06 00:59:22 | INFO     | app.parsers.dockerfile_parser | DockerfileParser | Parsing: Dockerfile
+2026-10-06 00:59:22 | INFO     | app.parsers.dockerfile_parser | DockerfileParser | Found 5 package references in Dockerfile
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | → 5 dependencies from Dockerfile
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | Parsing [package.json] frontend/package.json
+2026-10-06 00:59:22 | INFO     | app.parsers.package_json_parser | PackageJsonParser | Parsing: frontend/package.json
+2026-10-06 00:59:22 | INFO     | app.parsers.package_json_parser | PackageJsonParser | Found 2 dependencies in frontend/package.json
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | → 2 dependencies from frontend/package.json
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | Parsing [go.mod] go.mod
+2026-10-06 00:59:22 | INFO     | app.parsers.go_mod_parser | GoModParser | Parsing: go.mod
+2026-10-06 00:59:22 | INFO     | app.parsers.go_mod_parser | GoModParser | Found 4 dependencies in go.mod
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | → 4 dependencies from go.mod
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | Parsing [package.json] package.json
+2026-10-06 00:59:22 | INFO     | app.parsers.package_json_parser | PackageJsonParser | Parsing: package.json
+2026-10-06 00:59:22 | INFO     | app.parsers.package_json_parser | PackageJsonParser | Found 6 dependencies in package.json
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | → 6 dependencies from package.json
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | Parsing [pom.xml] pom.xml
+2026-10-06 00:59:22 | INFO     | app.parsers.pom_parser | PomParser | Parsing: pom.xml
+2026-10-06 00:59:22 | INFO     | app.parsers.pom_parser | PomParser | Found 4 dependencies in pom.xml
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | → 4 dependencies from pom.xml
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | Parsing [requirements.txt] requirements.txt
+2026-10-06 00:59:22 | INFO     | app.parsers.requirements_parser | RequirementsParser | Parsing: requirements.txt
+2026-10-06 00:59:22 | INFO     | app.parsers.requirements_parser | RequirementsParser | Found 7 dependencies in requirements.txt
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | → 7 dependencies from requirements.txt
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | Total raw parsed: 28 from 6 manifests
+2026-10-06 00:59:22 | INFO     | app.services.dependency.dependency_normalizer | DependencyNormalizer | Normalized 28 dependencies (26 unique, 0 warnings)
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | Normalized: 26 unique dependencies
+2026-10-06 00:59:22 | INFO     | app.services.dependency.dependency_resolver | DependencyResolver | Resolved: 14 / 26 dependencies. Unresolved: 12
+2026-10-06 00:59:22 | INFO     | app.services.dependency.transitive_analyzer | TransitiveAnalyzer | Phase 1 classification complete: 26 direct, 0 transitive
+2026-10-06 00:59:22 | INFO     | app.services.dependency.graph_builder | GraphBuilder | Building graph from 26 dependencies
+2026-10-06 00:59:22 | INFO     | app.services.dependency.graph_builder | GraphBuilder | Graph built: 27 nodes, 26 edges
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | DependencyEngine | Scan complete — status=completed_with_warnings | deps=26 (direct=26, transitive=0) | manifests=6/6 | errors=0 | warnings=1
+2026-10-06 00:59:22 | INFO     | app.services.dependency.engine | ════════════════════════════════════════════════════════════
+------------------------------ Captured log call ------------------------------
+INFO     app.services.pipeline:pipeline.py:39 Pipeline | Starting scan_id=scan-9ab5e902-0487-4bf9-9e8c-4de84bfe594d for D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+INFO     app.services.dependency.engine:engine.py:126 ════════════════════════════════════════════════════════════
+INFO     app.services.dependency.engine:engine.py:127 DependencyEngine | Starting scan (id=scan-9ab5e902-0487-4bf9-9e8c-4de84bfe594d)
+INFO     app.services.dependency.engine:engine.py:128 DependencyEngine | Repository: D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+INFO     app.services.dependency.repository_scanner:repository_scanner.py:81 RepositoryScanner | Scanning: D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+INFO     app.services.dependency.repository_scanner:repository_scanner.py:86 RepositoryScanner | Found 7 files in D:\BE\Final Year Project\RootTrace\backend\app\tests\test_fixtures
+INFO     app.services.dependency.engine:engine.py:146 DependencyEngine | Found 7 files in repository
+INFO     app.services.dependency.manifest_detector:manifest_detector.py:57 ManifestDetector | Scanning 7 files for manifests
+INFO     app.services.dependency.manifest_detector:manifest_detector.py:129 ManifestDetector | Detected 6 manifest(s) from 7 files
+INFO     app.services.dependency.engine:engine.py:168 DependencyEngine | Detected 6 manifest(s)
+INFO     app.services.dependency.engine:engine.py:184 DependencyEngine | Parsing [Dockerfile] Dockerfile
+INFO     app.parsers.dockerfile_parser:dockerfile_parser.py:137 DockerfileParser | Parsing: Dockerfile
+INFO     app.parsers.dockerfile_parser:dockerfile_parser.py:187 DockerfileParser | Found 5 package references in Dockerfile
+INFO     app.services.dependency.engine:engine.py:194 DependencyEngine | → 5 dependencies from Dockerfile
+INFO     app.services.dependency.engine:engine.py:184 DependencyEngine | Parsing [package.json] frontend/package.json
+INFO     app.parsers.package_json_parser:package_json_parser.py:60 PackageJsonParser | Parsing: frontend/package.json
+INFO     app.parsers.package_json_parser:package_json_parser.py:118 PackageJsonParser | Found 2 dependencies in frontend/package.json
+INFO     app.services.dependency.engine:engine.py:194 DependencyEngine | → 2 dependencies from frontend/package.json
+INFO     app.services.dependency.engine:engine.py:184 DependencyEngine | Parsing [go.mod] go.mod
+INFO     app.parsers.go_mod_parser:go_mod_parser.py:78 GoModParser | Parsing: go.mod
+INFO     app.parsers.go_mod_parser:go_mod_parser.py:136 GoModParser | Found 4 dependencies in go.mod
+INFO     app.services.dependency.engine:engine.py:194 DependencyEngine | → 4 dependencies from go.mod
+INFO     app.services.dependency.engine:engine.py:184 DependencyEngine | Parsing [package.json] package.json
+INFO     app.parsers.package_json_parser:package_json_parser.py:60 PackageJsonParser | Parsing: package.json
+INFO     app.parsers.package_json_parser:package_json_parser.py:118 PackageJsonParser | Found 6 dependencies in package.json
+INFO     app.services.dependency.engine:engine.py:194 DependencyEngine | → 6 dependencies from package.json
+INFO     app.services.dependency.engine:engine.py:184 DependencyEngine | Parsing [pom.xml] pom.xml
+INFO     app.parsers.pom_parser:pom_parser.py:97 PomParser | Parsing: pom.xml
+INFO     app.parsers.pom_parser:pom_parser.py:137 PomParser | Found 4 dependencies in pom.xml
+INFO     app.services.dependency.engine:engine.py:194 DependencyEngine | → 4 dependencies from pom.xml
+INFO     app.services.dependency.engine:engine.py:184 DependencyEngine | Parsing [requirements.txt] requirements.txt
+INFO     app.parsers.requirements_parser:requirements_parser.py:71 RequirementsParser | Parsing: requirements.txt
+INFO     app.parsers.requirements_parser:requirements_parser.py:82 RequirementsParser | Found 7 dependencies in requirements.txt
+INFO     app.services.dependency.engine:engine.py:194 DependencyEngine | → 7 dependencies from requirements.txt
+INFO     app.services.dependency.engine:engine.py:230 DependencyEngine | Total raw parsed: 28 from 6 manifests
+INFO     app.services.dependency.dependency_normalizer:dependency_normalizer.py:189 DependencyNormalizer | Normalized 28 dependencies (26 unique, 0 warnings)
+INFO     app.services.dependency.engine:engine.py:241 DependencyEngine | Normalized: 26 unique dependencies
+INFO     app.services.dependency.dependency_resolver:dependency_resolver.py:79 DependencyResolver | Resolved: 14 / 26 dependencies. Unresolved: 12
+INFO     app.services.dependency.transitive_analyzer:transitive_analyzer.py:95 TransitiveAnalyzer | Phase 1 classification complete: 26 direct, 0 transitive
+INFO     app.services.dependency.graph_builder:graph_builder.py:72 GraphBuilder | Building graph from 26 dependencies
+INFO     app.services.dependency.graph_builder:graph_builder.py:152 GraphBuilder | Graph built: 27 nodes, 26 edges
+INFO     app.services.dependency.engine:engine.py:295 DependencyEngine | Scan complete — status=completed_with_warnings | deps=26 (direct=26, transitive=0) | manifests=6/6 | errors=0 | warnings=1
+INFO     app.services.dependency.engine:engine.py:307 ════════════════════════════════════════════════════════════
+=========================== short test summary info ===========================
+FAILED app/tests/integration/test_pipeline_orchestrator.py::test_pipeline_scan_id_propagation
+FAILED app/tests/integration/test_pipeline_orchestrator.py::test_pipeline_cycle_protection
+FAILED app/tests/integration/test_pipeline_orchestrator.py::test_pipeline_partial_failure
+============================== 3 failed in 0.52s ==============================

@@ -131,6 +131,21 @@ class GraphBuilder:
                 if ROOT_NODE_ID not in graph.reverse_adjacency.get(dep.id, []):
                     graph.reverse_adjacency.setdefault(dep.id, []).append(ROOT_NODE_ID)
 
+            # Create edges from parent_ids
+            for parent_id in dep.parent_ids:
+                if parent_id in graph.nodes or parent_id == ROOT_NODE_ID:
+                    edge = DependencyEdge(
+                        source=parent_id,
+                        target=dep.id,
+                        relationship=EDGE_DEPENDS_ON,
+                    )
+                    graph.edges.append(edge)
+                    
+                    if dep.id not in graph.adjacency.get(parent_id, []):
+                        graph.adjacency.setdefault(parent_id, []).append(dep.id)
+                    if parent_id not in graph.reverse_adjacency.get(dep.id, []):
+                        graph.reverse_adjacency.setdefault(dep.id, []).append(parent_id)
+
         # Compute graph statistics
         graph.stats = self._compute_stats(graph, dependencies)
 

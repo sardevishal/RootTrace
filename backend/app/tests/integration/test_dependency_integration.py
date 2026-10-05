@@ -109,11 +109,15 @@ class TestDependencyAnalysisIntegration:
             assert isinstance(pkg, Package)
             assert pkg.package_name
             assert pkg.version
-            assert pkg.ecosystem in ("npm", "PyPI", "Maven", "Go", "RubyGems", "NuGet", "crates.io", "Packagist")
+            assert pkg.ecosystem in ("npm", "PyPI", "Maven", "Go", "RubyGems", "NuGet", "crates.io", "Packagist", "apt", "apk", "yum", "mixed")
 
         # Now pass directly to VulnerabilityEngine
         vuln_engine = VulnerabilityEngine()
-        vuln_response = vuln_engine.run_scan(packages=packages, scan_id=scan_result.scan_id)
+        from app.services.vulnerability.package_provider import PackageProvider
+        class StaticProv(PackageProvider):
+            def get_packages(self, scan_id=None): return packages
+            
+        vuln_response = vuln_engine.run_scan(package_provider=StaticProv(), scan_id=scan_result.scan_id)
 
         assert vuln_response.total_packages_scanned == len(packages)
         assert isinstance(vuln_response.packages, list)

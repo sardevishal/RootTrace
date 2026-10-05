@@ -73,14 +73,14 @@ class PackageJsonParser(BaseParser):
                 f"package.json must be a JSON object, got {type(data).__name__}: {manifest.path}"
             )
 
-        # ── Load lockfile resolved versions if available ───────────────────
-        resolved: dict[str, str] = {}
+        resolved, transitive_deps = {}, []
         if manifest.has_lockfile and manifest.lockfile_absolute_path:
-            resolved = self._load_lock_resolved(manifest.lockfile_absolute_path, manifest.lockfile_path or "")
+            resolved, transitive_deps = self._load_lock_full(manifest.lockfile_absolute_path, manifest.lockfile_path or "", manifest.path)
 
         # ── Parse each dependency section ─────────────────────────────────
         results: list[ParsedDependency] = []
 
+        direct_names = set()
         for section, dep_type in _SECTION_TYPE_MAP.items():
             section_data = data.get(section)
             if not section_data or not isinstance(section_data, dict):
@@ -91,12 +91,18 @@ class PackageJsonParser(BaseParser):
                 if not pkg_name:
                     continue
 
+                direct_names.add(pkg_name)
                 # version_spec may be a URL, git ref, "file:...", etc.
                 raw_spec = str(version_spec).strip() if version_spec else None
 
                 # Only treat pure semver ranges as version specs
                 cleaned_spec = _clean_version_spec(raw_spec)
                 exact_version = resolved.get(pkg_name)
+                
+                # If no lockfile, and cleaned_spec is a strict version (no range chars)
+                if exact_version is None and cleaned_spec:
+                    if not any(c in cleaned_spec for c in "^~><*x|"):
+                        exact_version = cleaned_spec
 
                 results.append(ParsedDependency(
                     name=pkg_name,
@@ -109,6 +115,11 @@ class PackageJsonParser(BaseParser):
                     metadata={"raw_version_spec": raw_spec},
                 ))
 
+        # Add transitive dependencies
+        for t_dep in transitive_deps:
+            if t_dep.name not in direct_names:
+                results.append(t_dep)
+
         logger.info(
             "PackageJsonParser | Found %d dependencies in %s",
             len(results),
@@ -116,62 +127,63 @@ class PackageJsonParser(BaseParser):
         )
         return results
 
-    def _load_lock_resolved(self, lockfile_path: str, relative_path: str) -> dict[str, str]:
-        """
-        Parse package-lock.json and return a mapping of package_name → resolved_version.
-
-        Supports lockfile formats v1, v2, and v3.
-
-        Args:
-            lockfile_path: Absolute path to package-lock.json.
-            relative_path: Relative path (for logging only).
-
-        Returns:
-            dict mapping package name → exact resolved version string.
-        """
+    def _load_lock_full(self, lockfile_path: str, relative_path: str, manifest_path: str) -> tuple[dict[str, str], list[ParsedDependency]]:
         resolved: dict[str, str] = {}
+        transitive_deps: list[ParsedDependency] = []
 
         try:
             content = self._read_file(lockfile_path)
             data = json.loads(content)
-        except (FileNotFoundError, json.JSONDecodeError, OSError) as exc:
-            logger.warning(
-                "PackageJsonParser | Could not read lockfile %s — %s",
-                relative_path,
-                exc,
-            )
-            return resolved
+        except Exception as exc:
+            logger.warning("PackageJsonParser | Could not read lockfile %s — %s", relative_path, exc)
+            return resolved, transitive_deps
 
         lock_version = data.get("lockfileVersion", 1)
 
-        if lock_version in (2, 3):
-            # v2/v3: use "packages" field
-            packages = data.get("packages", {})
-            for key, val in packages.items():
+        # Process v1 "dependencies" tree for full transitive graph (also included in v2)
+        deps_tree = data.get("dependencies", {})
+        
+        def _traverse(node: dict, parent_id: Optional[str] = None):
+            for pkg_name, val in node.items():
                 if not isinstance(val, dict):
                     continue
-                # Key format: "node_modules/lodash" or "node_modules/a/node_modules/b"
-                if key.startswith("node_modules/"):
+                version = val.get("version")
+                if not version:
+                    continue
+                
+                # Deduplicate and build basic parent mapping (simple version for Phase 2B)
+                resolved.setdefault(pkg_name, version)
+                
+                dep_id = f"npm:{pkg_name}@{version}"
+                parents = [parent_id] if parent_id else []
+                
+                t_dep = ParsedDependency(
+                    name=pkg_name,
+                    ecosystem="npm",
+                    source_manifest="package.json",
+                    source_path=manifest_path,
+                    version=version,
+                    dependency_type="indirect",
+                    metadata={"parents": parents}
+                )
+                transitive_deps.append(t_dep)
+                
+                if "dependencies" in val:
+                    _traverse(val["dependencies"], dep_id)
+
+        _traverse(deps_tree)
+
+        # For v2/v3 fallback to get resolved versions if dependencies tree is missing
+        if lock_version in (2, 3) and not deps_tree:
+            packages = data.get("packages", {})
+            for key, val in packages.items():
+                if isinstance(val, dict) and key.startswith("node_modules/"):
                     pkg_name = key.split("node_modules/")[-1]
                     version = val.get("version")
                     if pkg_name and version:
                         resolved[pkg_name] = version
 
-        # v1 (and v2 fallback): use "dependencies" field
-        deps_v1 = data.get("dependencies", {})
-        if isinstance(deps_v1, dict):
-            for pkg_name, val in deps_v1.items():
-                if isinstance(val, dict) and "version" in val:
-                    # Don't overwrite a v2/v3 entry
-                    resolved.setdefault(pkg_name, val["version"])
-
-        logger.debug(
-            "PackageJsonParser | Lockfile v%s resolved %d packages from %s",
-            lock_version,
-            len(resolved),
-            relative_path,
-        )
-        return resolved
+        return resolved, transitive_deps
 
 
 def _clean_version_spec(raw: Optional[str]) -> Optional[str]:

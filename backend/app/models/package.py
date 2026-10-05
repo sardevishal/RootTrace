@@ -5,6 +5,7 @@ Pydantic model representing a single software package to be scanned.
 This is the internal domain object — never pass raw dicts around.
 """
 
+from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 from app.utils.constants import SUPPORTED_ECOSYSTEMS
 
@@ -20,10 +21,13 @@ class Package(BaseModel):
         min_length=1,
         description="Name of the package (e.g. 'lodash', 'requests').",
     )
-    version: str = Field(
-        ...,
-        min_length=1,
-        description="Exact version string (e.g. '4.17.15').",
+    version: Optional[str] = Field(
+        default=None,
+        description="Exact version string (e.g. '4.17.15'). None if unresolved.",
+    )
+    version_spec: Optional[str] = Field(
+        default=None,
+        description="Version specification string (e.g. '^4.17.0').",
     )
     ecosystem: str = Field(
         ...,
@@ -40,7 +44,7 @@ class Package(BaseModel):
             )
         return v
 
-    @field_validator("package_name", "version")
+    @field_validator("package_name")
     @classmethod
     def must_not_be_blank(cls, v: str) -> str:
         if not v.strip():

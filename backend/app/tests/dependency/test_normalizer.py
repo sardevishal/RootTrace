@@ -60,3 +60,29 @@ def test_normalizer_and_resolver():
     # django should have version extracted from ==3.14.0
     django_resolved = next(d for d in resolved_deps if d.name == "django-rest-framework")
     assert django_resolved.version == "3.14.0"
+
+def test_deduplication_same_version():
+    """Scenario 1: Same package, same resolved version -> 1 logical dependency."""
+    normalizer = DependencyNormalizer()
+    parsed_list = [
+        ParsedDependency(name="lodash", ecosystem="npm", source_manifest="package.json", source_path="package.json", version="4.17.15"),
+        ParsedDependency(name="lodash", ecosystem="npm", source_manifest="package.json", source_path="package.json", version="4.17.15"),
+    ]
+    deps, warnings = normalizer.normalize_all(parsed_list)
+    assert len(deps) == 1
+    assert deps[0].name == "lodash"
+    assert deps[0].version == "4.17.15"
+
+def test_deduplication_different_version():
+    """Scenario 2: Same package, different resolved versions -> 2 logical dependencies."""
+    normalizer = DependencyNormalizer()
+    parsed_list = [
+        ParsedDependency(name="lodash", ecosystem="npm", source_manifest="package.json", source_path="package.json", version="4.17.15"),
+        ParsedDependency(name="lodash", ecosystem="npm", source_manifest="package.json", source_path="package.json", version="4.17.21"),
+    ]
+    deps, warnings = normalizer.normalize_all(parsed_list)
+    assert len(deps) == 2
+    
+    versions = {d.version for d in deps}
+    assert "4.17.15" in versions
+    assert "4.17.21" in versions

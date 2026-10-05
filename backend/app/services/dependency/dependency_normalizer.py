@@ -113,11 +113,12 @@ class DependencyNormalizer:
                 version_spec=parsed.version_spec,
                 ecosystem=ecosystem,
                 dependency_type=parsed.dependency_type,
-                direct=True,      # All parsed deps are direct by default
-                transitive=False, # Transitive analysis happens later
-                depth=0,          # Depth set by TransitiveAnalyzer
+                direct=not bool(parsed.metadata.get("parents")),
+                transitive=bool(parsed.metadata.get("parents")),
+                depth=0,
                 source_manifest=parsed.source_manifest,
                 source_path=parsed.source_path,
+                parent_ids=parsed.metadata.get("parents", []),
                 group_id=parsed.group_id,
                 artifact_id=parsed.artifact_id,
                 maven_scope=parsed.maven_scope,
@@ -155,7 +156,7 @@ class DependencyNormalizer:
               - List of unique, normalized Dependency objects
               - List of warning messages for any skipped/failed entries
         """
-        seen_ids: set[str] = set()
+        seen_deps: dict[str, Dependency] = {}
         results: list[Dependency] = []
         warnings: list[str] = []
 
@@ -167,20 +168,28 @@ class DependencyNormalizer:
                 )
                 continue
 
-            if dep.id in seen_ids:
+            if dep.id in seen_deps:
                 logger.debug(
-                    "DependencyNormalizer | Deduplicating %s (already seen)",
+                    "DependencyNormalizer | Deduplicating %s (already seen), merging parent_ids",
                     dep.id,
                 )
+                # Merge parent_ids
+                existing_dep = seen_deps[dep.id]
+                for pid in dep.parent_ids:
+                    if pid not in existing_dep.parent_ids:
+                        existing_dep.parent_ids.append(pid)
+                # Ensure direct remains True if any occurrence is direct
+                if dep.direct and not parsed.metadata.get("parents"):
+                    existing_dep.direct = True
                 continue
 
-            seen_ids.add(dep.id)
+            seen_deps[dep.id] = dep
             results.append(dep)
 
         logger.info(
             "DependencyNormalizer | Normalized %d dependencies (%d unique, %d warnings)",
             len(parsed_list),
-            len(results),
+            len(seen_deps),
             len(warnings),
         )
         return results, warnings

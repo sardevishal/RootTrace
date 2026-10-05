@@ -1,0 +1,9 @@
+{
+  "name": "test-repo",
+  "version": "1.0.0",
+  "dependencies": {
+    "lodash": "^4.17.0",
+    "express": "^4.17.0",
+    "unresolved-pkg": ">=2.0.0"
+  }
+}

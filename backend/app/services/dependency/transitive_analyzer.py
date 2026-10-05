@@ -55,20 +55,43 @@ class TransitiveAnalyzer:
         direct_count = 0
         transitive_count = 0
 
+        # Create a lookup for quick access
+        dep_map = {d.id: d for d in dependencies}
+
+        # Iteratively calculate depth based on parents
+        # Direct dependencies (no parents) have depth 1
         for dep in dependencies:
-            is_transitive = self._is_transitive(dep)
-
-            if is_transitive:
-                dep.direct = False
-                dep.transitive = True
-                dep.depth = 2  # Phase 1: transitive = depth 2 (direct of direct)
-                transitive_count += 1
-            else:
-                dep.direct = True
-                dep.transitive = False
-                dep.depth = 1  # Direct deps are at depth 1 (app root is 0)
+            if dep.direct:
+                dep.depth = 1
                 direct_count += 1
+            else:
+                dep.transitive = True
+                transitive_count += 1
 
+        # Simple BFS to assign depth to transitive dependencies
+        queue = [d for d in dependencies if d.direct]
+        visited = {d.id for d in queue}
+        
+        while queue:
+            current = queue.pop(0)
+            
+            # Find all dependencies that have `current.id` in their parent_ids
+            children = [d for d in dependencies if current.id in d.parent_ids]
+            
+            for child in children:
+                if child.id not in visited:
+                    child.depth = current.depth + 1
+                    visited.add(child.id)
+                    queue.append(child)
+                else:
+                    # Update depth to the minimum possible path if seen again
+                    child.depth = min(child.depth, current.depth + 1)
+
+        # Unreachable nodes (e.g. detached transitive deps without a direct parent)
+        for dep in dependencies:
+            if dep.id not in visited:
+                dep.depth = 2 # fallback
+                
         logger.info(
             "TransitiveAnalyzer | Phase 1 classification complete: "
             "%d direct, %d transitive",
