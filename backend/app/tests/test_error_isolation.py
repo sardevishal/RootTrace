@@ -59,7 +59,12 @@ def test_osv_partial_failure_error_isolation():
             return [{"id": "GHSA-D", "summary": "Vuln D", "affected": [{"package": {"name": "pkg-d"}, "versions": ["1.0.0"]}]}]
         return []
 
+    from app.services.vulnerability.sources.osv_source import OSVSource
+    from app.services.vulnerability.fetcher import VulnerabilityFetcher
+    
     with patch("app.clients.osv_client.OSVClient.query", side_effect=mock_query):
+        # Override the engine's fetcher to ONLY use OSV
+        engine._fetcher = VulnerabilityFetcher(sources=[OSVSource()])
         result = engine.run_scan(package_provider=provider)
 
         # Overall scan assertions
@@ -111,8 +116,11 @@ def test_osv_total_success():
             return self.pkgs
             
     provider = DummyPackageProvider(packages)
+    from app.services.vulnerability.sources.osv_source import OSVSource
+    from app.services.vulnerability.fetcher import VulnerabilityFetcher
     
     with patch("app.clients.osv_client.OSVClient.query", return_value=[]):
+        engine._fetcher = VulnerabilityFetcher(sources=[OSVSource()])
         result = engine.run_scan(package_provider=provider)
         assert result.status == "completed"
         assert result.source_status["OSV"] == "ok"
@@ -136,8 +144,11 @@ def test_osv_total_failure():
             return self.pkgs
             
     provider = DummyPackageProvider(packages)
+    from app.services.vulnerability.sources.osv_source import OSVSource
+    from app.services.vulnerability.fetcher import VulnerabilityFetcher
     
     with patch("app.clients.osv_client.OSVClient.query", side_effect=OSVClientError("Timeout", error_type="timeout")):
+        engine._fetcher = VulnerabilityFetcher(sources=[OSVSource()])
         result = engine.run_scan(package_provider=provider)
         assert result.status == "completed_with_warnings"
         assert result.source_status["OSV"] == "unavailable"

@@ -89,8 +89,16 @@ def test_pipeline_partial_failure(fixtures_path):
             raise OSVClientError("Timeout", error_type="timeout", status_code=504)
         return []
 
+    from app.services.vulnerability.sources.osv_source import OSVSource
+    from app.services.vulnerability.fetcher import VulnerabilityFetcher
+    from app.services.vulnerability.engine import VulnerabilityEngine
+
+    test_engine = VulnerabilityEngine()
+    test_engine._fetcher = VulnerabilityFetcher(sources=[OSVSource()])
+
     with patch("app.clients.osv_client.OSVClient.query", side_effect=mock_query):
-        result = orchestrator.run_pipeline(fixtures_path)
+        with patch("app.services.pipeline.VulnerabilityEngine", return_value=test_engine):
+            result = orchestrator.run_pipeline(fixtures_path)
         
         # express fails, lodash succeeds. Other packages have no vulns.
         # So we should get a warning.
